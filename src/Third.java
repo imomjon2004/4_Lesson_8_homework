@@ -7,30 +7,29 @@ public class Third {
     static String filePath = "a.txt";
 
     public static void main(String[] args) {
-
-        System.out.println("""
-                1.Write
-                2.Remove pen
-                3.Remove book
-                """);
-        switch (new Scanner(System.in).nextInt()) {
-            case 1 -> generate(filePath, 1000);
-            case 2 -> {
-                Thread removePen = new Thread(() -> {
-                    remove(filePath, "pen");
-                });
-                removePen.start();
-            }
-            case 3 -> {
-                Thread removeBook = new Thread(() -> {
-                    remove(filePath, "book");
-                });
-                removeBook.start();
+        while (true) {
+            System.out.print("""
+                    1.Write
+                    2.Remove pen
+                    3.Remove book
+                    Choose -> 
+                    """);
+            switch (new Scanner(System.in).nextInt()) {
+                case 1 -> generate(filePath, 1000);
+                case 2 -> {
+                    Thread removePen = new Thread(() -> {
+                        remove(filePath, "pen");
+                    });
+                    removePen.start();
+                }
+                case 3 -> {
+                    Thread removeBook = new Thread(() -> {
+                        remove(filePath, "book");
+                    });
+                    removeBook.start();
+                }
             }
         }
-
-        String filePath = "a.txt";
-        generate(filePath, 1000);
     }
 
     private static String random() {
