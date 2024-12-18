@@ -1,73 +1,47 @@
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 public class Main {
-    public static void main(String[] args) throws InterruptedException, ExecutionException {
-        final int RANGE = 1_000_000;
-        final int THREAD_COUNT = 5;
-
-        // Oddiy usulda hisoblash
-        long startTime1 = System.currentTimeMillis();
-        long simpleSum = calculateSumSimple(1, RANGE);
-        long endTime1 = System.currentTimeMillis();
-        System.out.println("Oddiy usuldagi yig'indi: " + simpleSum);
-        System.out.println("Oddiy usul ishlash vaqti: " + (endTime1 - startTime1) + " ms\n");
-
-        // ExecutorService va Future yordamida hisoblash
-        ExecutorService executor = Executors.newFixedThreadPool(THREAD_COUNT);
-        List<Future<Long>> futures = new ArrayList<>();
-
-        int rangePerThread = RANGE / THREAD_COUNT;
-        long startTime2 = System.currentTimeMillis();
-
-        for (int i = 0; i < THREAD_COUNT; i++) {
-            int start = i * rangePerThread + 1;
-            int end = (i == THREAD_COUNT - 1) ? RANGE : (start + rangePerThread - 1);
-            futures.add(executor.submit(new SumTask(start, end)));
-        }
-
-        long totalSum = 0;
-        for (Future<Long> future : futures) {
-            totalSum += future.get(); // Har bir threaddan natijalarni yig'ish
-        }
-
-        long endTime2 = System.currentTimeMillis();
-        executor.shutdown();
-
-        System.out.println("Threadlar orqali hisoblangan yig'indi: " + totalSum);
-        System.out.println("Threadlar ishlash vaqti: " + (endTime2 - startTime2) + " ms");
-
-        // Vaqtlar farqi
-        System.out.println("Tezlik farqi: " + ((endTime1 - startTime1) - (endTime2 - startTime2)) + " ms");
-    }
-
-    // Oddiy usulda hisoblash
-    private static long calculateSumSimple(int start, int end) {
+    public static void main(String[] args) throws ExecutionException, InterruptedException {
+        long start = System.currentTimeMillis();
         long sum = 0;
-        for (int i = start; i <= end; i++) {
+        for (int i = 1; i <= 1_000_000; i++) {
             sum += i;
         }
-        return sum;
+        System.out.println("sum: " + sum);
+        long end = System.currentTimeMillis();
+        System.out.println(end - start + "ms");
+
+        long start1 = System.currentTimeMillis();
+        sum();
+        long end1 = System.currentTimeMillis();
+        System.out.println(end1 - start1 + "ms");
+
     }
 
-    // Thread orqali hisoblash vazifasi
-    static class SumTask implements Callable<Long> {
-        private final int start;
-        private final int end;
+    public static void sum() throws ExecutionException, InterruptedException {
+        ExecutorService executorService = Executors.newFixedThreadPool(5);
+        long totalSum = 0;
 
-        public SumTask(int start, int end) {
-            this.start = start;
-            this.end = end;
+        for (int i = 0; i < 5; i++) {
+            int rangeStart = 1 + i * 200_000;
+            int rangeEnd = rangeStart + 200_000 - 1;
+
+            Future<Long> future = executorService.submit(() -> {
+                long sum = 0;
+                for (int j = rangeStart; j <= rangeEnd; j++) {
+                    sum += j;
+                }
+                return sum;
+            });
+
+            totalSum += future.get();
         }
 
-        @Override
-        public Long call() {
-            long sum = 0;
-            for (int i = start; i <= end; i++) {
-                sum += i;
-            }
-            return sum;
-        }
+        executorService.shutdown();
+        System.out.println("sum: " + totalSum);
     }
+
 }
