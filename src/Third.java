@@ -61,13 +61,6 @@ public class Third {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        if (!inputFile.delete()) {
-            System.out.println("Could not delete the original file");
-        }
-        if (!tempFile.renameTo(inputFile)) {
-            System.out.println("Could not rename the temp file");
-        }
     }
 }
 
