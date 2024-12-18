@@ -10,8 +10,7 @@ public class Third {
         while (true) {
             System.out.print("""
                     1.Write
-                    2.Remove pen
-                    3.Remove book
+                    2.Remove pen, remove book
                     Choose -> 
                     """);
             switch (new Scanner(System.in).nextInt()) {
@@ -20,12 +19,10 @@ public class Third {
                     Thread removePen = new Thread(() -> {
                         remove(filePath, "pen");
                     });
-                    removePen.start();
-                }
-                case 3 -> {
                     Thread removeBook = new Thread(() -> {
                         remove(filePath, "book");
                     });
+                    removePen.start();
                     removeBook.start();
                 }
             }
